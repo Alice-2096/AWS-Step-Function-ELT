@@ -45,6 +45,8 @@ module "iam" {
   s3_source_bucket_arn = module.s3.bucket_arn
   stream_arn           = module.kinesis.stream_arn
   state_machine_arn    = module.step_functions.state_machine_arn
+  kinesis_kms_key_arn  = module.kms.kinesis_kms_key_arn
+  bucket_kms_key_arn   = module.kms.s3_source_kms_key_arn
 }
 
 #################### Lambda ####################

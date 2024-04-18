@@ -15,13 +15,13 @@ locals {
     },
     {
       name        = "s3ToKinesis"
-      runtime     = "nodejs20.x"
+      runtime     = "nodejs16.x"
       handler     = "index.handler"
       description = "push new events from S3 to Kinesis data stream"
-      source_code = "./modules/lambda/functions/s3ToKinesis/index.mjs"
+      source_code = "./modules/lambda/functions/s3ToKinesis/index.js"
       environment = {
         STREAM_NAME = var.stream_name
-        AWS_REGION  = var.region
+        REGION      = var.region
       }
       policies = [local.lambda_basic_exec_arn, var.kinesis_producer_policy_arn,
       var.s3_access_policy_arn]
@@ -50,6 +50,8 @@ module "lambda_function" {
   number_of_policies = length(local.lambda_functions[count.index].policies)
 }
 
+
+#################### S3 event notification for Lambda Producer ####################
 # grant s3 permission to invoke lambda function 
 resource "aws_lambda_permission" "allow_bucket" {
   statement_id  = "AllowExecutionFromS3Bucket"
@@ -72,3 +74,14 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   }
   depends_on = [aws_lambda_permission.allow_bucket]
 }
+
+
+#################### Kinesis event source mapping ####################
+# resource "aws_lambda_event_source_mapping" "kinesis_event_source_mapping" {
+#   event_source_arn  = module.kinesis.stream_arn
+#   function_name     = module.lambda_function[0].lambda_function_name
+#   starting_position = "LATEST"
+#   batch_size        = 100
+#   depends_on        = [module.lambda_function]
+# }
+

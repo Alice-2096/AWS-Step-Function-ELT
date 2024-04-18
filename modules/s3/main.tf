@@ -10,7 +10,7 @@ resource "aws_s3_bucket" "source_bucket" {
 resource "aws_s3_bucket_ownership_controls" "ownership" {
   bucket = aws_s3_bucket.source_bucket.id
   rule {
-    object_ownership = "BucketOwnerEnforced"
+    object_ownership = "BucketOwnerPreferred"
   }
 }
 
