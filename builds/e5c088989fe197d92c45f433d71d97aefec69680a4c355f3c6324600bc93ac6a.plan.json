@@ -1,0 +1,1 @@
+{"filename": "builds/e5c088989fe197d92c45f433d71d97aefec69680a4c355f3c6324600bc93ac6a.zip", "runtime": "nodejs20.x", "artifacts_dir": "builds", "build_plan": [["zip", "./modules/lambda/functions/s3ToKinesis/index.mjs", null]]}
