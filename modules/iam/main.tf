@@ -60,18 +60,3 @@ resource "aws_iam_policy" "s3_access" {
     ]
   })
 }
-
-resource "aws_iam_policy" "kms_decrypt_kinesis_policy" {
-  name        = "KMSDecryptKinesis"
-  description = "Allow Lambda to decrypt Kinesis data stream"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Action" : "kms:Decrypt",
-        "Resource" : "*" //! This is a security risk
-      }
-    ]
-  })
-}

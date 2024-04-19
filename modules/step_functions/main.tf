@@ -148,6 +148,5 @@ module "step-functions" {
   #       lambda = [var.lambda_sf_1.arn]
   #     }
   #   }
-
   type = "STANDARD"
 }

@@ -1,1 +1,0 @@
-{"filename": "builds/71d4a3f078ba875e05e01c60a7f58e3165bb5a04b1777d2ff60df792da95455f.zip", "runtime": "nodejs20.x", "artifacts_dir": "builds", "build_plan": [["zip", "./modules/lambda/functions/kinesisToStepFunction/index.mjs", null]]}

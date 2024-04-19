@@ -13,16 +13,11 @@ provider "aws" {
 }
 
 #################### Kinesis ####################
-module "kms" {
-  source = "./modules/kms"
-}
-
 module "kinesis" {
-  source              = "./modules/kinesis"
-  stream_name         = var.stream_name
-  shard_count         = var.shard_count
-  retention_period    = var.retention_period
-  kinesis_kms_key_arn = module.kms.kinesis_kms_key_arn
+  source           = "./modules/kinesis"
+  stream_name      = var.stream_name
+  shard_count      = var.shard_count
+  retention_period = var.retention_period
 }
 
 #################### Step Functions ####################
@@ -35,7 +30,6 @@ module "step_functions" {
 #################### S3 #################### 
 module "s3" {
   source       = "./modules/s3"
-  kms_key_arn  = module.kms.s3_source_kms_key_arn
   project_name = var.project_name
 }
 
@@ -45,8 +39,6 @@ module "iam" {
   s3_source_bucket_arn = module.s3.bucket_arn
   stream_arn           = module.kinesis.stream_arn
   state_machine_arn    = module.step_functions.state_machine_arn
-  kinesis_kms_key_arn  = module.kms.kinesis_kms_key_arn
-  bucket_kms_key_arn   = module.kms.s3_source_kms_key_arn
 }
 
 #################### Lambda ####################
@@ -62,6 +54,5 @@ module "lambda" {
   pull_from_kinesis_policy_arn    = module.iam.kinesis_consumer_access_policy_arn
   invoke_step_function_policy_arn = module.iam.invoke_step_function_policy_arn
   kinesis_producer_policy_arn     = module.iam.kinesis_producer_access_policy_arn
-  kms_decrypt_kinesis_policy_arn  = module.iam.kms_decrypt_kinesis_policy_arn
 }
 
