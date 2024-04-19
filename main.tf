@@ -55,11 +55,13 @@ module "lambda" {
   region                          = var.region
   state_machine_arn               = module.step_functions.state_machine_arn
   stream_name                     = module.kinesis.stream_name
+  stream_arn                      = module.kinesis.stream_arn
   s3_source_bucket_arn            = module.s3.bucket_arn
   s3_source_bucket_id             = module.s3.bucket_id
   s3_access_policy_arn            = module.iam.s3_access_policy_arn
   pull_from_kinesis_policy_arn    = module.iam.kinesis_consumer_access_policy_arn
   invoke_step_function_policy_arn = module.iam.invoke_step_function_policy_arn
   kinesis_producer_policy_arn     = module.iam.kinesis_producer_access_policy_arn
+  kms_decrypt_kinesis_policy_arn  = module.iam.kms_decrypt_kinesis_policy_arn
 }
 

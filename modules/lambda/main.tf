@@ -77,11 +77,12 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
 
 
 #################### Kinesis event source mapping ####################
-# resource "aws_lambda_event_source_mapping" "kinesis_event_source_mapping" {
-#   event_source_arn  = module.kinesis.stream_arn
-#   function_name     = module.lambda_function[0].lambda_function_name
-#   starting_position = "LATEST"
-#   batch_size        = 100
-#   depends_on        = [module.lambda_function]
-# }
+resource "aws_lambda_event_source_mapping" "kinesis_event_source_mapping" {
+  event_source_arn  = var.stream_arn
+  function_name     = module.lambda_function[0].lambda_function_arn
+  enabled           = true
+  starting_position = "LATEST"
+  batch_size        = 100
+  depends_on        = [module.lambda_function]
+}
 

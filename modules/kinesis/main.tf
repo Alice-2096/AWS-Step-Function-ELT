@@ -13,8 +13,7 @@ resource "aws_kinesis_stream" "stream" {
   }
 
   encryption_type = "KMS"
-  kms_key_id      = var.kinesis_kms_key_arn
-
+  kms_key_id      = "alias/aws/kinesis" # AWS managed key
   tags = {
     Environment = "dev"
   }

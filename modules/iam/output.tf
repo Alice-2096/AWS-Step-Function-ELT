@@ -11,3 +11,7 @@ output "invoke_step_function_policy_arn" {
 output "kinesis_consumer_access_policy_arn" {
   value = aws_iam_policy.pull_from_kinesis.arn
 }
+output "kms_decrypt_kinesis_policy_arn" {
+  value = aws_iam_policy.kms_decrypt_kinesis_policy.arn
+
+}

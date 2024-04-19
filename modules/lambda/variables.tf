@@ -4,6 +4,9 @@ variable "region" {
 variable "stream_name" {
   description = "The name of the Kinesis data stream to push events to."
 }
+variable "stream_arn" {
+  description = "The ARN of the Kinesis data stream to push events to."
+}
 variable "state_machine_arn" {
   description = "The ARN of the Step Function to trigger from Kinesis."
 }
