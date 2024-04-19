@@ -1,4 +1,3 @@
-#! need to dynamically inject the lambda arn's into the state machine definition
 locals {
   definition_template = <<EOF
 {
@@ -17,7 +16,7 @@ locals {
               "Resource": "arn:aws:states:::lambda:invoke",
               "Parameters": {
                 "Payload.$": "$",
-                "FunctionName": "arn:aws:lambda:us-east-1:789264351109:function:processData:$LATEST"
+                "FunctionName": "${var.lambda_step_function_1_arn}"
               },
               "Retry": [
                 {
@@ -45,7 +44,7 @@ locals {
               "Resource": "arn:aws:states:::lambda:invoke",
               "Parameters": {
                 "Payload.$": "$",
-                "FunctionName": "arn:aws:lambda:us-east-1:789264351109:function:processData-2:$LATEST"
+                "FunctionName": "${var.lambda_step_function_2_arn}"
               },
               "Retry": [
                 {
@@ -73,16 +72,12 @@ locals {
         {
           "Or": [
             {
-              "Or": [
-                {
-                  "Variable": "$[0].Payload.status",
-                  "StringEquals": "FAILED"
-                },
-                {
-                  "Variable": "$[1].Payload.status",
-                  "StringEquals": "FAILED"
-                }
-              ]
+              "Variable": "$[0].Payload.status",
+              "StringEquals": "FAILED"
+            },
+            {
+              "Variable": "$[1].Payload.status",
+              "StringEquals": "FAILED"
             }
           ],
           "Next": "handleFailure"
@@ -96,7 +91,7 @@ locals {
       "OutputPath": "$.Payload",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "arn:aws:lambda:us-east-1:789264351109:function:HandleStepfunctionFailure:$LATEST"
+        "FunctionName": "${var.lambda_step_function_handle_failure_arn}"
       },
       "Retry": [
         {
@@ -118,7 +113,8 @@ locals {
       "End": true,
       "Parameters": {
         "Body": {
-          "status.$": "$[0].Payload.status"
+          "status.$": "$[0].Payload.status",
+          "message": "Processing complete!"
         },
         "Bucket": "lab-bucket-1234",
         "Key": "MyData"
@@ -134,7 +130,7 @@ module "step-functions" {
   source      = "terraform-aws-modules/step-functions/aws"
   version     = "4.2.0"
   name        = var.state_machine_name
-  definition  = var.state_machine_definition
+  definition  = local.definition_template
   create_role = true
   publish     = true
   logging_configuration = {
@@ -142,11 +138,28 @@ module "step-functions" {
     level                  = "ALL"
   }
 
-  # TODO 
-  #   service_integrations = { # will automatically create policies to attach to the role 
-  #     lambda = {
-  #       lambda = [var.lambda_sf_1.arn]
-  #     }
-  #   }
+  service_integrations = { # will automatically create policies to attach to the role 
+    lambda = {
+      lambda = [
+        var.lambda_step_function_1_arn,
+        var.lambda_step_function_2_arn,
+      var.lambda_step_function_handle_failure_arn]
+    }
+  }
+
+  attach_policy_statements = true
+  policy_statements = {
+    s3_read = {
+      effect    = "Allow",
+      actions   = ["s3:PutObject"],
+      resources = [data.aws_s3_bucket.bucket.arn]
+    }
+  }
+
   type = "STANDARD"
+}
+
+# fetch s3 bucket arn
+data "aws_s3_bucket" "bucket" {
+  bucket = "lab-bucket-1234"
 }

@@ -22,9 +22,12 @@ module "kinesis" {
 
 #################### Step Functions ####################
 module "step_functions" {
-  source                   = "./modules/step_functions"
-  state_machine_name       = var.state_machine_name
-  state_machine_definition = var.state_machine_definition
+  source                                  = "./modules/step_functions"
+  state_machine_name                      = var.state_machine_name
+  state_machine_definition                = var.state_machine_definition
+  lambda_step_function_1_arn              = module.lambda.lambda_step_function_1_arn
+  lambda_step_function_2_arn              = module.lambda.lambda_step_function_2_arn
+  lambda_step_function_handle_failure_arn = module.lambda.lambda_step_function_handle_failure_arn
 }
 
 #################### S3 #################### 

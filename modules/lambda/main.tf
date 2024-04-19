@@ -27,7 +27,35 @@ locals {
       var.s3_access_policy_arn]
     }
   ]
-
+  step_lambda_functions = [
+    {
+      name        = "etl_data_processor_1"
+      runtime     = "nodejs20.x"
+      handler     = "processor_1.handler"
+      description = "Lambda function to process data from Kinesis"
+      source_code = "./modules/lambda/functions/stepFunction/processor_1.mjs"
+      environment = {}
+      policy      = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+    },
+    {
+      name        = "etl_data_processor_2"
+      runtime     = "nodejs20.x"
+      handler     = "processor_2.handler"
+      description = "Lambda function to process data from Kinesis"
+      source_code = "./modules/lambda/functions/stepFunction/processor_2.mjs"
+      environment = {}
+      policy      = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+    },
+    {
+      name        = "etl_data_processor_handle_failure"
+      runtime     = "nodejs20.x"
+      handler     = "handle_failure.handler"
+      description = "Lambda function to handle failure in processing data from Kinesis"
+      source_code = "./modules/lambda/functions/stepFunction/handle_failure.mjs"
+      environment = {}
+      policy      = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+    }
+  ]
 }
 
 
@@ -86,3 +114,24 @@ resource "aws_lambda_event_source_mapping" "kinesis_event_source_mapping" {
   depends_on        = [module.lambda_function]
 }
 
+
+
+#################### Step Function ####################
+
+module "lambda_function_step_function" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "7.2.2"
+  count   = length(local.step_lambda_functions)
+
+  function_name = local.step_lambda_functions[count.index].name
+  runtime       = local.step_lambda_functions[count.index].runtime
+  handler       = local.step_lambda_functions[count.index].handler
+  description   = local.step_lambda_functions[count.index].description
+  source_path   = local.step_lambda_functions[count.index].source_code
+
+  environment_variables = local.step_lambda_functions[count.index].environment
+
+  # attach policy to the Lambda Function to allow access other AWS services
+  attach_policy = true
+  policy        = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}

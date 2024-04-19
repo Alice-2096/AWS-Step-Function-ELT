@@ -1,0 +1,1 @@
+{"filename": "builds/868ba73c55d949eba32a248bc69f8f933653dd08643c90af51d646ff5833a409.zip", "runtime": "nodejs20.x", "artifacts_dir": "builds", "build_plan": [["zip", "./modules/lambda/functions/stepFunction/handle_failure.mjs", null]]}
